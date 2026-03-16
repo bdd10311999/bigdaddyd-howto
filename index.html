@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How bigdaddyd.net Works</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #E8A020;
+    --gold-dark: #B87A10;
+    --gold-light: #F5C84A;
+    --bg: #0E0E0E;
+    --bg2: #161616;
+    --bg3: #1E1E1E;
+    --surface: #242424;
+    --border: rgba(255,255,255,0.08);
+    --text: #F0EDE6;
+    --text-muted: #888880;
+    --teal: #2ABFAA;
+    --coral: #E8593C;
+    --amber: #E8A020;
+    --purple: #8B6FD4;
+    --blue: #3B8BD4;
+    --gray: #888880;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 40px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    background: var(--bg2);
+  }
+
+  .header-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 0.04em;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .header-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding-bottom: 6px;
+  }
+
+  /* ── LAYOUT ── */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    height: calc(100vh - 113px);
+  }
+
+  /* ── DIAGRAM PANEL ── */
+  .diagram-panel {
+    padding: 40px;
+    overflow: auto;
+    position: relative;
+  }
+
+  .diagram-intro {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+
+  .diagram-intro span {
+    color: var(--gold);
+  }
+
+  svg.diagram {
+    width: 100%;
+    max-width: 680px;
+    display: block;
+  }
+
+  /* SVG node styles */
+  .node-box {
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .node-box:hover rect { filter: brightness(1.2); }
+  .node-box.active rect { stroke-width: 2.5 !important; }
+
+  .node-box rect {
+    transition: filter 0.15s;
+  }
+
+  /* ── INFO PANEL ── */
+  .info-panel {
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .info-default {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 40px;
+    text-align: center;
+    gap: 16px;
+    color: var(--text-muted);
+  }
+
+  .info-default .arrow-hint {
+    font-size: 40px;
+    opacity: 0.3;
+  }
+
+  .info-default p {
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 240px;
+  }
+
+  .info-content {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .info-content.visible {
+    display: flex;
+  }
+
+  .info-header {
+    padding: 28px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg2);
+    z-index: 1;
+  }
+
+  .info-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .info-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: var(--gold);
+  }
+
+  .info-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  .info-body {
+    padding: 24px 28px;
+    flex: 1;
+  }
+
+  .info-section {
+    margin-bottom: 28px;
+  }
+
+  .info-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .info-section p {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .step-list {
+    list-style: none;
+    counter-reset: steps;
+  }
+
+  .step-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+
+  .step-list li::before {
+    content: counter(steps);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--bg);
+    background: var(--gold);
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .tip-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  .tip-box strong {
+    color: var(--gold);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .warn-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--coral);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  .warn-box strong {
+    color: var(--coral);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .url-pill {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: var(--teal);
+    margin: 2px 0;
+  }
+
+  .close-btn {
+    display: block;
+    margin: 0 28px 24px;
+    padding: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .close-btn:hover {
+    background: var(--bg3);
+    color: var(--text);
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .legend-line {
+    width: 28px;
+    height: 2px;
+    background: var(--text-muted);
+  }
+
+  .legend-dashed {
+    background: repeating-linear-gradient(90deg, var(--text-muted) 0, var(--text-muted) 4px, transparent 4px, transparent 8px);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: auto; }
+    .info-panel { border-left: none; border-top: 1px solid var(--border); min-height: 400px; }
+    header { padding: 24px; flex-direction: column; align-items: flex-start; gap: 8px; }
+    .diagram-panel { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-logo">Big Daddy D &amp; The Dynamites</div>
+  <div class="header-sub">How bigdaddyd.net works — click any component to learn more</div>
+</header>
+
+<div class="main">
+
+  <!-- ── DIAGRAM ── -->
+  <div class="diagram-panel">
+    <div class="diagram-intro">
+      <span>↓ Tap any box</span> to see what it does and how to manage it
+    </div>
+
+    <svg class="diagram" viewBox="0 0 620 530" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="arr-gold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- ── ROW 1: PHOTO PIPELINE ── -->
+
+      <!-- Google Drive -->
+      <g class="node-box" id="node-drive" onclick="showInfo('drive')">
+        <rect x="20" y="30" width="130" height="52" rx="8" fill="#0F2E28" stroke="#2ABFAA" stroke-width="1"/>
+        <text x="85" y="52" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" font-weight="500" fill="#2ABFAA">Google Drive</text>
+        <text x="85" y="70" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#1A8070">Band photos</text>
+      </g>
+
+      <!-- Raspberry Pi -->
+      <g class="node-box" id="node-pi" onclick="showInfo('pi')">
+        <rect x="190" y="30" width="130" height="52" rx="8" fill="#1C1C1C" stroke="#666" stroke-width="1"/>
+        <text x="255" y="52" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" font-weight="500" fill="#AAA">Raspberry Pi</text>
+        <text x="255" y="70" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#666">Syncs photos via cron</text>
+      </g>
+
+      <!-- GitHub -->
+      <g class="node-box" id="node-github" onclick="showInfo('github')">
+        <rect x="360" y="30" width="130" height="52" rx="8" fill="#1C1C1C" stroke="#666" stroke-width="1"/>
+        <text x="425" y="52" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" font-weight="500" fill="#AAA">GitHub</text>
+        <text x="425" y="70" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#666">Source code + photos</text>
+      </g>
+
+      <!-- Cloudflare -->
+      <g class="node-box" id="node-cloudflare" onclick="showInfo('cloudflare')">
+        <rect x="360" y="130" width="130" height="52" rx="8" fill="#2A1E00" stroke="#E8A020" stroke-width="1"/>
+        <text x="425" y="152" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" font-weight="500" fill="#E8A020">Cloudflare</text>
+        <text x="425" y="170" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#A06010">Hosts &amp; deploys site</text>
+      </g>
+
+      <!-- Drive → Pi -->
+      <line x1="150" y1="56" x2="190" y2="56" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Pi → GitHub -->
+      <line x1="320" y1="56" x2="360" y2="56" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="340" y="48" text-anchor="middle" font-family="'DM Mono',monospace" font-size="10" fill="#555">pushes</text>
+
+      <!-- GitHub → Cloudflare -->
+      <line x1="425" y1="82" x2="425" y2="130" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="440" y="110" text-anchor="start" font-family="'DM Mono',monospace" font-size="10" fill="#555">auto-deploy</text>
+
+      <!-- ── CENTER: WEBSITE ── -->
+      <g class="node-box" id="node-website" onclick="showInfo('website')">
+        <rect x="185" y="240" width="200" height="60" rx="10" fill="#1E1228" stroke="#8B6FD4" stroke-width="1.5"/>
+        <text x="285" y="265" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="20" letter-spacing="0.05em" fill="#8B6FD4">bigdaddyd.net</text>
+        <text x="285" y="283" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#5A4890">The hub — all roads lead here</text>
+      </g>
+
+      <!-- Cloudflare → Website -->
+      <path d="M425 182 L425 270 L385 270" fill="none" stroke="#E8A020" stroke-width="1.5" marker-end="url(#arr-gold)"/>
+      <text x="440" y="230" text-anchor="start" font-family="'DM Mono',monospace" font-size="10" fill="#888">serves site</text>
+
+      <!-- ── LEFT: CALENDAR + YOUTUBE ── -->
+
+      <!-- Google Calendar -->
+      <g class="node-box" id="node-calendar" onclick="showInfo('calendar')">
+        <rect x="20" y="180" width="130" height="52" rx="8" fill="#0F2E28" stroke="#2ABFAA" stroke-width="1"/>
+        <text x="85" y="202" text-anchor="middle" font-family="'DM Mono',monospace" font-size="11" font-weight="500" fill="#2ABFAA">Google Calendar</text>
+        <text x="85" y="220" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#1A8070">Manually updated</text>
+      </g>
+
+      <!-- YouTube -->
+      <g class="node-box" id="node-youtube" onclick="showInfo('youtube')">
+        <rect x="20" y="300" width="130" height="52" rx="8" fill="#2A1008" stroke="#E8593C" stroke-width="1"/>
+        <text x="85" y="322" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" font-weight="500" fill="#E8593C">YouTube</text>
+        <text x="85" y="340" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#A03020">Owner: rmutter</text>
+      </g>
+
+      <!-- Calendar → Website (on demand) -->
+      <line x1="150" y1="206" x2="185" y2="255" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="152" y="228" text-anchor="start" font-family="'DM Mono',monospace" font-size="10" fill="#555">on demand</text>
+
+      <!-- YouTube → Website (on demand) -->
+      <line x1="150" y1="326" x2="185" y2="285" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="152" y="316" text-anchor="start" font-family="'DM Mono',monospace" font-size="10" fill="#555">on demand</text>
+
+      <!-- ── RIGHT: PRINTFUL + BUTTONDOWN ── -->
+
+      <!-- Printful -->
+      <g class="node-box" id="node-printful" onclick="showInfo('printful')">
+        <rect x="420" y="180" width="130" height="52" rx="8" fill="#08142A" stroke="#3B8BD4" stroke-width="1"/>
+        <text x="485" y="202" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" font-weight="500" fill="#3B8BD4">Printful</text>
+        <text x="485" y="220" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#1A4A80">Merch store</text>
+      </g>
+
+      <!-- Buttondown -->
+      <g class="node-box" id="node-buttondown" onclick="showInfo('buttondown')">
+        <rect x="420" y="300" width="130" height="52" rx="8" fill="#08142A" stroke="#3B8BD4" stroke-width="1"/>
+        <text x="485" y="322" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" font-weight="500" fill="#3B8BD4">Buttondown</text>
+        <text x="485" y="340" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#1A4A80">Email newsletter</text>
+      </g>
+
+      <!-- Printful → Website (on demand) -->
+      <line x1="420" y1="206" x2="385" y2="255" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="388" y="228" text-anchor="end" font-family="'DM Mono',monospace" font-size="10" fill="#555">on demand</text>
+
+      <!-- Website → Buttondown (fans subscribe) -->
+      <line x1="385" y1="285" x2="420" y2="326" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="388" y="316" text-anchor="end" font-family="'DM Mono',monospace" font-size="10" fill="#555">fans subscribe</text>
+
+      <!-- ── BOTTOM: NEWSLETTER TOOL ── -->
+      <g class="node-box" id="node-newsletter" onclick="showInfo('newsletter')">
+        <rect x="165" y="410" width="240" height="52" rx="8" fill="#1E1228" stroke="#8B6FD4" stroke-width="1"/>
+        <text x="285" y="432" text-anchor="middle" font-family="'DM Mono',monospace" font-size="11" font-weight="500" fill="#8B6FD4">newsletter-gigs.html</text>
+        <text x="285" y="450" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#5A4890">Reads calendar → formats for newsletter</text>
+      </g>
+
+      <!-- Calendar → Newsletter Tool (dashed) -->
+      <path d="M85 232 L85 436 L165 436" fill="none" stroke="#444" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+
+      <!-- Newsletter Tool → Buttondown (dashed) -->
+      <path d="M405 436 L485 436 L485 352" fill="none" stroke="#444" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+      <text x="445" y="428" text-anchor="middle" font-family="'DM Mono',monospace" font-size="10" fill="#555">copy/paste</text>
+
+    </svg>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-line"></div>
+        Automatic feed
+      </div>
+      <div class="legend-item">
+        <div class="legend-line legend-dashed"></div>
+        Manual / copy-paste
+      </div>
+    </div>
+  </div>
+
+  <!-- ── INFO PANEL ── -->
+  <div class="info-panel">
+
+    <div class="info-default" id="info-default">
+      <div class="arrow-hint">←</div>
+      <p>Click any box in the diagram to learn what it does and how to manage it.</p>
+    </div>
+
+    <div class="info-content" id="info-content">
+      <div class="info-header">
+        <div class="info-tag" id="info-tag">Component</div>
+        <div class="info-title" id="info-title">Title</div>
+        <div class="info-subtitle" id="info-subtitle"></div>
+      </div>
+      <div class="info-body" id="info-body"></div>
+      <button class="close-btn" onclick="closeInfo()">← Back to diagram</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const data = {
+  website: {
+    tag: 'The Hub',
+    title: 'bigdaddyd.net',
+    subtitle: 'The main band website — everything visible to fans',
+    what: `<p>bigdaddyd.net is a static website, meaning it's just three files: <span class="url-pill">index.html</span>, <span class="url-pill">styles.css</span>, and <span class="url-pill">script.js</span>. There's no server, no database, and nothing to log into. This makes it fast, free, and very reliable.</p>
+<p>When a fan visits the site, their browser loads these files from Cloudflare and then fetches live data from Google Calendar, YouTube, and Printful automatically.</p>`,
+    steps: [
+      'Edit <code>index.html</code> in GitHub to change text or content',
+      'Commit the change — Cloudflare detects it and rebuilds the site',
+      'Within 1–2 minutes the live site is updated',
+      'No manual publishing required'
+    ],
+    tip: { type: 'tip', label: 'Good to know', text: 'Routine updates like adding gigs or photos happen automatically — you only need to touch code for structural changes.' }
+  },
+  drive: {
+    tag: 'Photo Source',
+    title: 'Google Drive',
+    subtitle: 'bdd10311999@gmail.com — where band photos live',
+    what: `<p>Band photos are stored in Google Drive under the bdd10311999 account, organized into folders that match the website gallery categories.</p>
+<p>Required folder names: <span class="url-pill">band-members</span> <span class="url-pill">shows</span> <span class="url-pill">promo</span> <span class="url-pill">history</span> <span class="url-pill">behind-the-scenes</span> <span class="url-pill">other</span></p>`,
+    steps: [
+      'Sign in to Google Drive as bdd10311999@gmail.com',
+      'Open the correct folder (e.g. "shows")',
+      'Upload your photo — use simple filenames with no spaces (e.g. show-2026-04-05.jpg)',
+      'The Raspberry Pi will sync it to the website automatically on its next run'
+    ],
+    tip: { type: 'warn', label: 'Watch out', text: 'Never use spaces or special characters in photo filenames — they can break the gallery display.' }
+  },
+  pi: {
+    tag: 'Automation',
+    title: 'Raspberry Pi',
+    subtitle: 'Rick\'s home server — runs the photo sync automatically',
+    what: `<p>The Raspberry Pi is a small home server that runs a scheduled script (cron job) to sync new photos from Google Drive to the GitHub repository. This happens automatically on a schedule — nobody has to do anything manually.</p>
+<p>Once photos land in GitHub, Cloudflare detects the change and rebuilds the website to include the new photos.</p>`,
+    steps: [
+      'You upload a photo to the correct Google Drive folder',
+      'The Pi\'s cron job runs on its schedule and detects the new photo',
+      'The Pi pushes the photo to the GitHub repo',
+      'Cloudflare auto-deploys — the photo appears on the site'
+    ],
+    tip: { type: 'warn', label: 'If photos aren\'t appearing', text: 'Check that the Raspberry Pi is powered on and connected to the internet. The cron job only runs when the Pi is online.' }
+  },
+  github: {
+    tag: 'Source Control',
+    title: 'GitHub',
+    subtitle: 'bdd10311999/bigdaddyd-website — stores all site files',
+    what: `<p>GitHub is where all the website source code and photos live. It's like a filing cabinet with a full history of every change ever made — you can always roll back if something goes wrong.</p>
+<p>Repository: <span class="url-pill">github.com/bdd10311999/bigdaddyd-website</span></p>`,
+    steps: [
+      'Go to github.com and sign in as bdd10311999',
+      'Navigate to the bdd10311999/bigdaddyd-website repository',
+      'Click on a file to view it, or click the pencil icon to edit',
+      'After editing, click "Commit changes" — Cloudflare auto-deploys within minutes'
+    ],
+    tip: { type: 'tip', label: 'Version naming', text: 'Save working copies as BigDaddyD-Site-FINAL_XX.zip before uploading — this makes rollbacks easy.' }
+  },
+  cloudflare: {
+    tag: 'Hosting',
+    title: 'Cloudflare Pages',
+    subtitle: 'Free hosting that auto-deploys from GitHub',
+    what: `<p>Cloudflare Pages hosts the live website and delivers it to fans worldwide. It watches the GitHub repository — whenever a file changes, it automatically rebuilds and publishes the site within 1–2 minutes.</p>
+<p>It also manages the <span class="url-pill">bigdaddyd.net</span> domain name and handles HTTPS security automatically.</p>`,
+    steps: [
+      'Go to dash.cloudflare.com and sign in',
+      'Navigate to Pages → bigdaddyd-website',
+      'Check the Deployments tab to see recent deploys and their status',
+      'If a deploy failed, click it to see the error, then click Retry'
+    ],
+    tip: { type: 'tip', label: 'Good to know', text: 'You almost never need to log into Cloudflare — it runs itself. Only visit if something seems broken.' }
+  },
+  calendar: {
+    tag: 'Gig Dates',
+    title: 'Google Calendar',
+    subtitle: 'bdd10311999@gmail.com — the source of all gig listings',
+    what: `<p>Gig dates, times, and venues are managed in Google Calendar under the bdd10311999 account. The website reads this calendar directly whenever a fan visits — so updates appear on the site within minutes of being saved.</p>
+<p>The newsletter gig tool also reads from this same calendar to generate formatted show listings for the Buttondown newsletter.</p>`,
+    steps: [
+      'Sign in to calendar.google.com as bdd10311999@gmail.com',
+      'Click the date of the gig',
+      'Enter the event name — suggested format: Big Daddy D & The Dynamites @ Venue Name',
+      'Set the start time and add the venue address in the Location field',
+      'Save — the event appears on the website within minutes'
+    ],
+    tip: { type: 'tip', label: 'Naming tip', text: 'Keep event names consistent — they appear on the website exactly as entered.' }
+  },
+  youtube: {
+    tag: 'Videos',
+    title: 'YouTube Channel',
+    subtitle: 'Owned by rmutter — managed day-to-day by bdd10311999',
+    what: `<p>The YouTube channel hosts all band videos. The website video player fetches playlists directly from YouTube on demand — no code changes needed to add videos, just add them to the right playlist.</p>
+<p>Current playlists on the site: Featured Videos, Live Performances, Fan Videos.</p>`,
+    steps: [
+      'Sign in to YouTube as bdd10311999@gmail.com',
+      'To add a video: click Create → Upload video, add it to the appropriate playlist',
+      'To add a fan video: find it on YouTube, click ··· → Save to playlist → Fan Videos',
+      'The video appears on bigdaddyd.net automatically — no code change needed'
+    ],
+    tip: { type: 'warn', label: 'Important', text: 'The channel is owned by rmutter@gmail.com and must stay that way — it\'s grandfathered with no payment required. Do NOT attempt to transfer ownership.' }
+  },
+  printful: {
+    tag: 'Merchandise',
+    title: 'Printful',
+    subtitle: 'bigdaddyd.printful.me — print-on-demand merch',
+    what: `<p>Printful handles all band merchandise — printing, packaging, and shipping directly to fans. The website displays product images and links to the Printful store. Orders never pass through the band — Printful handles everything.</p>
+<p>Current products: Coffee Mug (11oz/15oz), Dad Hat, Pint Glass, V-Neck Tee, Crew Tee, Water Bottle.</p>`,
+    steps: [
+      'Log in to printful.com',
+      'Go to Stores → your Quick Store → Products',
+      'To edit a product: click it, then Edit',
+      'To add a product: click Add Product, upload your design, select high-res mockups',
+      'After adding/changing a product, the website image URLs in index.html need updating too'
+    ],
+    tip: { type: 'warn', label: 'Image quality', text: 'Always choose the highest resolution mockup in Printful. Low-res (w90) images will appear blurry on the website.' }
+  },
+  buttondown: {
+    tag: 'Newsletter',
+    title: 'Buttondown',
+    subtitle: 'Email newsletter platform for fan communications',
+    what: `<p>Buttondown manages the band's email newsletter list. Fans sign up directly from the bigdaddyd.net website. The newsletter gig tool at <span class="url-pill">bigdaddyd.net/newsletter-gigs.html</span> pulls upcoming gig dates from Google Calendar and formats them for easy copy-paste into a newsletter draft.</p>`,
+    steps: [
+      'Go to bigdaddyd.net/newsletter-gigs.html and copy the gig listing for the month',
+      'Log in to Buttondown',
+      'Click New Email and write your newsletter',
+      'Paste the gig listing where appropriate',
+      'Preview, then send or schedule'
+    ],
+    tip: { type: 'tip', label: 'Good to know', text: 'Fans subscribe from the bigdaddyd.net website — the signup form feeds directly into your Buttondown subscriber list.' }
+  },
+  newsletter: {
+    tag: 'Hidden Tool',
+    title: 'newsletter-gigs.html',
+    subtitle: 'Private backstage tool — not linked on the main site',
+    what: `<p>A simple one-page tool that reads upcoming gig events from Google Calendar and formats them into a clean list ready to paste into the Buttondown newsletter. It's only accessible if you know the URL — it doesn't appear anywhere on the public website.</p>
+<p>URL: <span class="url-pill">bigdaddyd.net/newsletter-gigs.html</span></p>`,
+    steps: [
+      'Go to bigdaddyd.net/newsletter-gigs.html',
+      'Select the month from the dropdown',
+      'Click Get Gigs — events are pulled from Google Calendar',
+      'Click Copy to Clipboard',
+      'Paste directly into your Buttondown newsletter draft'
+    ],
+    tip: { type: 'warn', label: 'Important', text: 'This tool only works at bigdaddyd.net — opening the file locally from your desktop will give a "blocked" error due to Google API security restrictions.' }
+  }
+};
+
+function showInfo(id) {
+  const d = data[id];
+  if (!d) return;
+
+  document.getElementById('info-default').style.display = 'none';
+  document.getElementById('info-content').classList.add('visible');
+
+  document.getElementById('info-tag').textContent = d.tag;
+  document.getElementById('info-title').textContent = d.title;
+  document.getElementById('info-subtitle').textContent = d.subtitle;
+
+  const stepsHTML = d.steps.map(s => `<li>${s}</li>`).join('');
+  const tipHTML = d.tip ? `<div class="${d.tip.type === 'warn' ? 'warn-box' : 'tip-box'}"><strong>${d.tip.label}</strong>${d.tip.text}</div>` : '';
+
+  document.getElementById('info-body').innerHTML = `
+    <div class="info-section">
+      <div class="info-section-label">What it is</div>
+      ${d.what}
+    </div>
+    <div class="info-section">
+      <div class="info-section-label">How to manage it</div>
+      <ol class="step-list">${stepsHTML}</ol>
+      ${tipHTML}
+    </div>
+  `;
+
+  document.querySelectorAll('.node-box').forEach(n => n.classList.remove('active'));
+  const activeNode = document.getElementById('node-' + id);
+  if (activeNode) activeNode.classList.add('active');
+
+  document.getElementById('info-content').scrollTop = 0;
+}
+
+function closeInfo() {
+  document.getElementById('info-default').style.display = 'flex';
+  document.getElementById('info-content').classList.remove('visible');
+  document.querySelectorAll('.node-box').forEach(n => n.classList.remove('active'));
+}
+</script>
+</body>
+</html>
