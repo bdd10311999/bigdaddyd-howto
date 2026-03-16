@@ -560,10 +560,10 @@ const data = {
     steps: [
       'Sign in to Google Drive as bdd10311999@gmail.com',
       'Open the correct folder (e.g. "shows")',
-      'Upload your photo — use simple filenames with no spaces (e.g. show-2026-04-05.jpg)',
+      'Upload your photo — use simple filenames with no spaces (e.g. show-yucca-tap-2026-04-05.jpg)',
       'The Raspberry Pi will sync it to the website automatically on its next run'
     ],
-    tip: { type: 'warn', label: 'Watch out', text: 'Never use spaces or special characters in photo filenames — they can break the gallery display.' }
+    tip: { type: 'warn', label: 'Watch out', text: 'Never use spaces or special characters in photo filenames — they can break the gallery display. Also: if you replace an edited photo, always give it a new unique name and delete the old one. The sync script identifies photos by filename only — same name = same photo as far as it is concerned, so the old version will stay on the site.' }
   },
   pi: {
     tag: 'Automation',
