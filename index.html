@@ -451,7 +451,7 @@
       <g class="node-box" id="node-youtube" onclick="showInfo('youtube')">
         <rect x="20" y="300" width="130" height="52" rx="8" fill="#2A1008" stroke="#E8593C" stroke-width="1"/>
         <text x="85" y="322" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" font-weight="500" fill="#E8593C">YouTube</text>
-        <text x="85" y="340" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#A03020">Owner: rmutter</text>
+        <text x="85" y="340" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#A03020">Owner: bdd10311999</text>
       </g>
 
       <!-- Calendar → Website (on demand) -->
@@ -610,7 +610,7 @@ const data = {
   calendar: {
     tag: 'Gig Dates',
     title: 'Google Calendar',
-    subtitle: 'bdd10311999@gmail.com — the source of all gig listings',
+    subtitle: 'bdd10311999@gmail.com — gig data served via Cloudflare Worker proxy',
     what: `<p>Gig dates, times, and venues are managed in Google Calendar under the bdd10311999 account. The website reads this calendar directly whenever a fan visits — so updates appear on the site within minutes of being saved.</p>
 <p>The newsletter gig tool also reads from this same calendar to generate formatted show listings for the Buttondown newsletter.</p>`,
     steps: [
@@ -625,16 +625,32 @@ const data = {
   youtube: {
     tag: 'Videos',
     title: 'YouTube Channel',
-    subtitle: 'Owned by rmutter — managed day-to-day by bdd10311999',
+    subtitle: 'Owned by bdd10311999@gmail.com — fully migrated April 2026',
     what: `<p>The YouTube channel hosts all band videos. The website video player fetches playlists directly from YouTube on demand — no code changes needed to add videos, just add them to the right playlist.</p>
-<p>Current playlists on the site: Featured Videos, Live Performances, Fan Videos.</p>`,
+<p>Current playlists on the site: Featured Videos, Live Performances, Fan Videos, Behind the Scenes.</p>`,
     steps: [
       'Sign in to YouTube as bdd10311999@gmail.com',
       'To add a video: click Create → Upload video, add it to the appropriate playlist',
       'To add a fan video: find it on YouTube, click ··· → Save to playlist → Fan Videos',
       'The video appears on bigdaddyd.net automatically — no code change needed'
     ],
-    tip: { type: 'warn', label: 'Important', text: 'The channel is owned by rmutter@gmail.com and must stay that way — it\'s grandfathered with no payment required. Do NOT attempt to transfer ownership.' }
+    tip: { type: 'tip', label: 'Good to know', text: 'The channel was migrated from rmutter@gmail.com to bdd10311999@gmail.com in April 2026. The YouTube API key is also now under the bdd account Google Cloud project, secured via the Cloudflare Worker proxy.' }
+  },
+  worker: {
+    tag: 'API Security',
+    title: 'Cloudflare Worker',
+    subtitle: 'bigdaddyd-api.bdd10311999.workers.dev — secure API proxy',
+    what: `<p>The Cloudflare Worker sits between the website and Google's APIs. When the website needs calendar events or YouTube playlist data, it calls the Worker — which then calls Google using API keys stored securely as secrets. The keys never appear in the website code or GitHub.</p>
+<p>Worker URL: <span class="url-pill">bigdaddyd-api.bdd10311999.workers.dev</span></p>
+<p>Two routes: <span class="url-pill">/</span> for Calendar API, <span class="url-pill">/youtube</span> for YouTube API.</p>`,
+    steps: [
+      'Go to dash.cloudflare.com and sign in as bdd10311999@gmail.com',
+      'Navigate to Workers & Pages → bigdaddyd-api',
+      'To update API keys: go to Settings → Variables and Secrets',
+      'To update Worker code: click Edit code',
+      'Deploy after any changes'
+    ],
+    tip: { type: 'tip', label: 'Good to know', text: 'The Worker has two secrets stored: CALENDAR_API_KEY and YOUTUBE_API_KEY — both under the bdd10311999 Google Cloud project "Big Daddy D Website". These keys are never visible in GitHub.' }
   },
   printful: {
     tag: 'Merchandise',
